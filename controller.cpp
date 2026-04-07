@@ -27,6 +27,12 @@ QString Controller::handleRequest(const QString &request) {
 
     if (parts[0] == "check" && parts.size() >= 4)
         return model.check(parts[1].toInt(), parts[2], parts[3]) ? "check+" : "check-";
+    if (parts[0] == "calc") {
+        double a = parts[1].toDouble();
+        double b = parts[2].toDouble();
+        double c = parts[3].toDouble();
 
+        return model.calc(a, b, c);
+    };
     return "error";
 }
