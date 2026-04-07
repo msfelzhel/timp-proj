@@ -1,5 +1,7 @@
 import sys
 import math
+import socket
+
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QSlider, QGroupBox, QTableWidget, QTableWidgetItem,
@@ -10,7 +12,22 @@ from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
 from PyQt5.QtGui import QPainter, QPen, QPolygonF, QColor, QFont
 
 
-# ---------------------- Кастомный вид для осей со стрелками ----------------------
+class TcpClient:
+    def __init__(self, host="127.0.0.1", port=1234):
+        self.host = host
+        self.port = port
+
+    def send(self, msg: str) -> str:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((self.host, self.port))
+                s.sendall((msg + "\n").encode("utf-8"))
+                data = s.recv(65536).decode("utf-8", errors="replace").strip()
+                return data
+        except Exception as e:
+            return f"error: {e}"
+
+
 class CustomChartView(QChartView):
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -19,43 +36,44 @@ class CustomChartView(QChartView):
         chart = self.chart()
         if not chart:
             return
-        # Ось X
+
         left = chart.mapToPosition(QPointF(chart.plotArea().left(), 0))
         right = chart.mapToPosition(QPointF(chart.plotArea().right(), 0))
-        # Ось Y
         bottom = chart.mapToPosition(QPointF(0, chart.plotArea().bottom()))
         top = chart.mapToPosition(QPointF(0, chart.plotArea().top()))
+
         pen = QPen(Qt.black, 1.5)
         painter.setPen(pen)
         painter.drawLine(left, right)
         painter.drawLine(bottom, top)
-        # Стрелки
+
         size = 8
         arrow_x = right
         painter.drawPolygon(QPolygonF([
             arrow_x,
-            QPointF(arrow_x.x() - size, arrow_x.y() - size/2),
-            QPointF(arrow_x.x() - size, arrow_x.y() + size/2)
+            QPointF(arrow_x.x() - size, arrow_x.y() - size / 2),
+            QPointF(arrow_x.x() - size, arrow_x.y() + size / 2)
         ]))
+
         arrow_y = top
         painter.drawPolygon(QPolygonF([
             arrow_y,
-            QPointF(arrow_y.x() - size/2, arrow_y.y() + size),
-            QPointF(arrow_y.x() + size/2, arrow_y.y() + size)
+            QPointF(arrow_y.x() - size / 2, arrow_y.y() + size),
+            QPointF(arrow_y.x() + size / 2, arrow_y.y() + size)
         ]))
 
 
-# ---------------------- Основной экран с функцией ----------------------
 class FunctionScreen(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, client, parent=None):
         super().__init__(parent)
+        self.client = client
         self.a, self.b, self.c = 1.0, 1.0, 1.0
+        self._dynamic_series = []
         self.init_ui()
 
     def init_ui(self):
         layout = QHBoxLayout(self)
 
-        # Левая панель
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.setAlignment(Qt.AlignTop)
@@ -75,14 +93,13 @@ class FunctionScreen(QWidget):
         left_layout.addWidget(formula)
         left_layout.addSpacing(20)
 
-        # Ползунки
         def make_slider(name, minv, maxv, val):
             group = QGroupBox(name)
             hbox = QHBoxLayout(group)
             slider = QSlider(Qt.Horizontal)
             slider.setRange(minv, maxv)
             slider.setValue(val)
-            label = QLabel(f"{val/10:.2f}")
+            label = QLabel(f"{val / 10:.2f}")
             hbox.addWidget(slider)
             hbox.addWidget(label)
             left_layout.addWidget(group)
@@ -94,7 +111,6 @@ class FunctionScreen(QWidget):
 
         left_layout.addSpacing(20)
 
-        # Таблица
         self.table = QTableWidget(11, 2)
         self.table.setHorizontalHeaderLabels(["x", "f(x)"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -104,14 +120,14 @@ class FunctionScreen(QWidget):
         left.setFixedWidth(350)
         layout.addWidget(left)
 
-        # График
         self.chart = QChart()
         self.chart.setTitle("График функции")
         self.chart.legend().hide()
 
-        self.series_left = QLineSeries()   # красный
-        self.series_mid = QLineSeries()    # зелёный
-        self.series_right = QLineSeries()  # синий
+        self.series_left = QLineSeries()
+        self.series_mid = QLineSeries()
+        self.series_right = QLineSeries()
+
         self.series_left.setPen(QPen(QColor(255, 0, 0), 1.5))
         self.series_mid.setPen(QPen(QColor(0, 255, 0), 1.5))
         self.series_right.setPen(QPen(QColor(0, 0, 255), 1.5))
@@ -123,8 +139,10 @@ class FunctionScreen(QWidget):
         self.axis_x = QValueAxis()
         self.axis_x.setRange(-10, 10)
         self.axis_x.setTitleText("x")
+
         self.axis_y = QValueAxis()
         self.axis_y.setTitleText("f(x)")
+
         self.chart.addAxis(self.axis_x, Qt.AlignBottom)
         self.chart.addAxis(self.axis_y, Qt.AlignLeft)
 
@@ -139,11 +157,13 @@ class FunctionScreen(QWidget):
         self.y_line = QLineSeries()
         self.x_line.append(-10, 0)
         self.x_line.append(10, 0)
-        self.y_line.append(0, -100)
-        self.y_line.append(0, 100)
-        pen = QPen(Qt.black, 1.5)
-        self.x_line.setPen(pen)
-        self.y_line.setPen(pen)
+        self.y_line.append(0, -1)
+        self.y_line.append(0, 1)
+
+        black_pen = QPen(Qt.black, 1.5)
+        self.x_line.setPen(black_pen)
+        self.y_line.setPen(black_pen)
+
         self.chart.addSeries(self.x_line)
         self.chart.addSeries(self.y_line)
         self.x_line.attachAxis(self.axis_x)
@@ -155,23 +175,42 @@ class FunctionScreen(QWidget):
         self.chart_view.setRenderHint(QPainter.Antialiasing)
         layout.addWidget(self.chart_view, 1)
 
-        # Подключение сигналов
         self.slider_a.valueChanged.connect(self.update_all)
         self.slider_b.valueChanged.connect(self.update_all)
         self.slider_c.valueChanged.connect(self.update_all)
 
         self.update_all()
 
-    def f(self, x):
-        pi = math.pi
-        if x < -pi:
-            return math.cos(self.a * x)
-        if x < 0:
-            denom = x + pi
-            return self.b / denom if abs(denom) > 1e-12 else float('nan')
-        arg = self.c + x
-        s, c_ = math.sin(arg), math.cos(arg)
-        return c_ / s if abs(s) > 1e-12 else float('nan')
+    def _request_points(self, x_min: float, x_max: float, step: float):
+        response = self.client.send(
+            f"calc&{self.a}&{self.b}&{self.c}&{x_min}&{x_max}&{step}"
+        )
+        if not response.startswith("calc&"):
+            return []
+
+        payload = response.split("&", 1)[1].strip()
+        if not payload:
+            return []
+
+        points = []
+        for item in payload.split(";"):
+            item = item.strip()
+            if not item or "," not in item:
+                continue
+            xs, ys = item.split(",", 1)
+            try:
+                x = float(xs)
+                y = float(ys)
+            except ValueError:
+                continue
+            if math.isfinite(x) and math.isfinite(y):
+                points.append((x, y))
+        return points
+
+    def _clear_dynamic_series(self):
+        for s in self._dynamic_series:
+            self.chart.removeSeries(s)
+        self._dynamic_series.clear()
 
     def update_all(self):
         self.a = self.slider_a.value() / 10.0
@@ -184,56 +223,121 @@ class FunctionScreen(QWidget):
         self.update_plot()
 
     def update_table(self):
-        xs = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10]
-        self.table.setRowCount(len(xs))
-        for i, x in enumerate(xs):
-            y = self.f(x)
+        points = self._request_points(-10.0, 10.0, 2.0)
+        self.table.setRowCount(len(points))
+
+        for i, (x, y) in enumerate(points):
             self.table.setItem(i, 0, QTableWidgetItem(f"{x:.2f}"))
-            if math.isfinite(y):
-                self.table.setItem(i, 1, QTableWidgetItem(f"{y:.6f}"))
-            else:
-                self.table.setItem(i, 1, QTableWidgetItem("не опр."))
+            self.table.setItem(i, 1, QTableWidgetItem(f"{y:.6f}"))
+
         self.table.resizeColumnsToContents()
 
+    def _add_segment(self, points, color):
+        if len(points) < 2:
+            return
+
+        series = QLineSeries()
+        series.setPen(QPen(color, 1.5))
+
+        for x, y in points:
+            series.append(x, y)
+
+        self.chart.addSeries(series)
+        series.attachAxis(self.axis_x)
+        series.attachAxis(self.axis_y)
+        self._dynamic_series.append(series)
+
     def update_plot(self):
+        self._clear_dynamic_series()
         self.series_left.clear()
         self.series_mid.clear()
         self.series_right.clear()
-        step = 0.05
-        pi = math.pi
 
-        def fill(series, x1, x2):
-            x = x1
-            while x <= x2 + step/2:
-                y = self.f(x)
-                if math.isfinite(y):
-                    series.append(x, y)
-                x += step
-
-        fill(self.series_left, -10.0, -pi - 1e-9)
-        fill(self.series_mid, -pi, -0.0001)
-        fill(self.series_right, 0.0, 10.0)
-
-        all_pts = []
-        for s in (self.series_left, self.series_mid, self.series_right):
-            all_pts.extend(s.pointsVector())
-        if all_pts:
-            ymin = min(p.y() for p in all_pts)
-            ymax = max(p.y() for p in all_pts)
-            margin = (ymax - ymin) * 0.05 or 0.5
-            self.axis_y.setRange(ymin - margin, ymax + margin)
-        else:
+        points = self._request_points(-10.0, 10.0, 0.05)
+        if not points:
             self.axis_y.setRange(-1, 1)
+            self.y_line.clear()
+            self.y_line.append(0, -1)
+            self.y_line.append(0, 1)
+            self.chart.setTitle(f"График  |  a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
+            return
 
-        y_min, y_max = self.axis_y.min(), self.axis_y.max()
+        left_points = []
+        mid_points = []
+        right_points = []
+
+        for x, y in points:
+            if x < -math.pi:
+                left_points.append((x, y))
+            elif x < 0:
+                mid_points.append((x, y))
+            else:
+                right_points.append((x, y))
+
+        def split_and_add(src_points, color):
+            if not src_points:
+                return
+            segment = [src_points[0]]
+            prev_x, prev_y = src_points[0]
+
+            for x, y in src_points[1:]:
+                if not math.isfinite(y) or abs(y) > 1e6:
+                    if len(segment) >= 2:
+                        self._add_segment(segment, color)
+                    segment = []
+                    prev_x, prev_y = x, y
+                    continue
+
+                if abs(y - prev_y) > 25 or abs(x - prev_x) > 0.2:
+                    if len(segment) >= 2:
+                        self._add_segment(segment, color)
+                    segment = [(x, y)]
+                else:
+                    segment.append((x, y))
+
+                prev_x, prev_y = x, y
+
+            if len(segment) >= 2:
+                self._add_segment(segment, color)
+
+        split_and_add(left_points, QColor(255, 0, 0))
+        split_and_add(mid_points, QColor(0, 255, 0))
+        split_and_add(right_points, QColor(0, 0, 255))
+
+        all_pts = points
+        # режем выбросы
+        filtered = [y for _, y in all_pts if abs(y) < 50]
+
+        if not filtered:
+            filtered = [0]
+
+        ymin = min(filtered)
+        ymax = max(filtered)
+
+        # фиксируем границы если надо
+        ymin = max(ymin, -20)
+        ymax = min(ymax, 20)
+
+        ymin = min(ymin, 0.0)
+        ymax = max(ymax, 0.0)
+
+        if abs(ymax - ymin) < 1e-9:
+            ymin -= 1.0
+            ymax += 1.0
+        else:
+            margin = (ymax - ymin) * 0.05
+            ymin -= margin
+            ymax += margin
+
+        self.axis_y.setRange(ymin, ymax)
+
         self.y_line.clear()
-        self.y_line.append(0, y_min)
-        self.y_line.append(0, y_max)
+        self.y_line.append(0, ymin)
+        self.y_line.append(0, ymax)
 
         self.chart.setTitle(f"График  |  a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
 
 
-# ---------------------- Титульный экран ----------------------
 class TitleScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -259,13 +363,11 @@ class TitleScreen(QWidget):
         layout.addWidget(self.start_btn, alignment=Qt.AlignCenter)
 
 
-# ---------------------- Авторизация / регистрация ----------------------
 class AuthScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent_app = parent
-        # Простая база пользователей (логин -> пароль)
-        self.users = {"admin": "admin123"}  # demo
+        self.client = TcpClient()
 
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
@@ -273,7 +375,6 @@ class AuthScreen(QWidget):
         self.stack = QStackedWidget()
         layout.addWidget(self.stack)
 
-        # Форма входа
         self.login_widget = QWidget()
         login_layout = QVBoxLayout(self.login_widget)
         login_layout.setAlignment(Qt.AlignCenter)
@@ -292,7 +393,6 @@ class AuthScreen(QWidget):
         login_layout.addWidget(self.login_btn)
         login_layout.addWidget(self.to_register_btn)
 
-        # Форма регистрации
         self.register_widget = QWidget()
         reg_layout = QVBoxLayout(self.register_widget)
         reg_layout.setAlignment(Qt.AlignCenter)
@@ -318,7 +418,6 @@ class AuthScreen(QWidget):
         self.stack.addWidget(self.login_widget)
         self.stack.addWidget(self.register_widget)
 
-        # Сигналы
         self.login_btn.clicked.connect(self.do_login)
         self.register_btn.clicked.connect(self.do_register)
         self.to_register_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.register_widget))
@@ -327,9 +426,11 @@ class AuthScreen(QWidget):
     def do_login(self):
         username = self.login_username.text().strip()
         password = self.login_password.text()
-        if username in self.users and self.users[username] == password:
+
+        response = self.client.send(f"auth&{username}&{password}")
+
+        if response.startswith("auth+"):
             QMessageBox.information(self, "Успех", f"Добро пожаловать, {username}!")
-            # Переключение на главный экран
             self.parent_app.show_function_screen()
         else:
             QMessageBox.warning(self, "Ошибка", "Неверный логин или пароль")
@@ -338,23 +439,26 @@ class AuthScreen(QWidget):
         username = self.reg_username.text().strip()
         password = self.reg_password.text()
         confirm = self.reg_confirm.text()
+
         if not username or not password:
             QMessageBox.warning(self, "Ошибка", "Заполните все поля")
             return
+
         if password != confirm:
             QMessageBox.warning(self, "Ошибка", "Пароли не совпадают")
             return
-        if username in self.users:
+
+        response = self.client.send(f"reg&{username}&{password}&test@mail.com")
+
+        if response.startswith("reg+"):
+            QMessageBox.information(self, "Успех", "Регистрация успешна! Теперь войдите.")
+            self.stack.setCurrentWidget(self.login_widget)
+            self.login_username.setText(username)
+            self.login_password.clear()
+        else:
             QMessageBox.warning(self, "Ошибка", "Пользователь уже существует")
-            return
-        self.users[username] = password
-        QMessageBox.information(self, "Успех", "Регистрация успешна! Теперь войдите.")
-        self.stack.setCurrentWidget(self.login_widget)
-        self.login_username.setText(username)
-        self.login_password.clear()
 
 
-# ---------------------- Главное окно со стеком ----------------------
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -369,19 +473,16 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.main_layout.addWidget(self.stacked_widget)
 
-        # Создаём экраны
         self.title_screen = TitleScreen()
-        self.auth_screen = AuthScreen(self)   # передаём ссылку на главное окно
-        self.function_screen = FunctionScreen()
+        self.auth_screen = AuthScreen(self)
+        self.function_screen = FunctionScreen(self.auth_screen.client)
 
         self.stacked_widget.addWidget(self.title_screen)
         self.stacked_widget.addWidget(self.auth_screen)
         self.stacked_widget.addWidget(self.function_screen)
 
-        # Подключаем кнопку "Начать"
         self.title_screen.start_btn.clicked.connect(self.show_auth_screen)
 
-        # Лавандовый фон для всех экранов
         self.setStyleSheet("""
             QWidget {
                 background-color: #E6E6FA;
