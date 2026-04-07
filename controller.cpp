@@ -8,6 +8,13 @@ QString Controller::handleRequest(const QString &request) {
 
     if (parts.isEmpty())
         return "";
+    if (parts[0] == "--help") {
+        return "Commands:\n"
+               "auth&login&password\n"
+               "reg&login&password&email\n"
+               "stat&login\n"
+               "check&task&variant&answer\n";
+    };
 
     if (parts[0] == "auth" && parts.size() >= 3)
         return model.auth(parts[1], parts[2]) ? "auth+&" + parts[1] : "auth-";

@@ -1,6 +1,7 @@
 #include "model.h"
 #include "sqlite3.h"
 #include <QDebug>
+#include <QCryptographicHash>
 
 sqlite3 *db;
 
@@ -37,7 +38,8 @@ void Model::createTable() {
  * @brief Регистрация пользователя
  */
 bool Model::reg(const QString &login, const QString &password, const QString &email) {
-    QString query = "INSERT INTO users VALUES('" + login + "','" + password + "','" + email + "');";
+    QString hashed = hashPassword(password);
+    QString query = "INSERT INTO users VALUES('" + login + "','" + hashed + "','" + email + "');";
 
     char *err = nullptr;
     int rc = sqlite3_exec(db, query.toUtf8().data(), 0, 0, &err);
@@ -55,7 +57,9 @@ bool Model::reg(const QString &login, const QString &password, const QString &em
  * @brief Авторизация
  */
 bool Model::auth(const QString &login, const QString &password) {
-    QString query = "SELECT * FROM users WHERE login='" + login + "' AND password='" + password + "';";
+    QString hashed = hashPassword(password);
+
+    QString query = "SELECT * FROM users WHERE login='" + login + "' AND password='" + hashed + "';";
 
     bool found = false;
 
@@ -82,4 +86,11 @@ QString Model::stat(const QString &) {
  */
 bool Model::check(int task, const QString &, const QString &answer) {
     return task == 1 && answer == "42";
+}
+QString hashPassword(const QString &password) {
+    QByteArray hash = QCryptographicHash::hash(
+        password.toUtf8(),
+        QCryptographicHash::Sha256
+        );
+    return hash.toHex();
 }
