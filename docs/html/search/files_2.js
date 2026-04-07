@@ -1,6 +1,0 @@
-var searchData=
-[
-  ['server_2ecpp_0',['server.cpp',['../server_8cpp.html',1,'']]],
-  ['server_2eh_1',['server.h',['../server_8h.html',1,'']]],
-  ['sqlite3_2eh_2',['sqlite3.h',['../sqlite3_8h.html',1,'']]]
-];
