@@ -3,8 +3,14 @@
 
 #include <QString>
 
+/**
+ * @brief Класс работы с базой данных SQLite
+ */
 class Model {
 public:
+    /**
+     * @brief Конструктор
+     */
     Model();
 
     bool auth(const QString &login, const QString &password);

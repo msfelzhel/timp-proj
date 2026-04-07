@@ -1,5 +1,8 @@
 #include "view.h"
 
+/**
+ * @brief Разделение строки по символу &
+ */
 QStringList View::parse(const QString &request) {
     QString clean = request.trimmed();
 

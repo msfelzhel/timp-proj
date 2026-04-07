@@ -17,9 +17,9 @@ find_package(Qt6 REQUIRED COMPONENTS Core Network)
 add_executable(timp_tsp_server
     main.cpp
     server.cpp server.h
-    controller.cpp
-    model.cpp
-    view.cpp
+    controller.cpp controller.h
+    model.cpp model.h
+    view.cpp view.h
     sqlite3.c
 )
 
