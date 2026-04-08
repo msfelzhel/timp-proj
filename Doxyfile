@@ -19,3 +19,27 @@ WARNINGS = YES
 
 SOURCE_BROWSER = YES
 INLINE_SOURCES = YES
+
+# ------------------- ВАЖНО ДЛЯ ГРАФОВ -------------------
+
+HAVE_DOT = YES
+
+# если Graphviz не находится, раскомментируй и укажи путь
+DOT_PATH = "C:\Program Files (x86)\Graphviz/bin"
+
+DOT_IMAGE_FORMAT = png
+
+CLASS_DIAGRAMS = YES
+CALL_GRAPH = YES
+CALLER_GRAPH = YES
+UML_LOOK = YES
+
+DOT_MULTI_TARGETS = YES
+DOT_CLEANUP = YES
+
+# улучшает читаемость графов
+DOT_GRAPH_MAX_NODES = 100
+MAX_DOT_GRAPH_DEPTH = 0
+
+# делает кликабельные графы
+INTERACTIVE_SVG = NO

@@ -1,0 +1,9 @@
+<map id="Model::reg" name="Model::reg">
+<area shape="rect" id="Node000001" title="Регистрация пользователя" alt="" coords="5,56,88,83"/>
+<area shape="rect" id="Node000002" href="$model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab" title=" " alt="" coords="136,5,243,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,53,137,36,133,40,88,58"/>
+<area shape="rect" id="Node000003" href="$sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db" title=" " alt="" coords="142,56,236,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="87,67,129,68,124,71,89,72"/>
+<area shape="rect" id="Node000004" href="$sqlite3_8h.html#a6552349e36a8a691af5487999ab09519" title=" " alt="" coords="145,107,234,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="87,81,138,100,133,102,86,86"/>
+</map>

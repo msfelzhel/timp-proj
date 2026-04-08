@@ -1,0 +1,7 @@
+<map id="sqlite3_exec" name="sqlite3_exec">
+<area shape="rect" id="Node000001" title=" " alt="" coords="143,31,237,57"/>
+<area shape="rect" id="Node000002" href="$class_model.html#a273d98ef3da82cad575d23e67401c66f" title="Авторизация" alt="" coords="5,5,95,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,33,95,29,95,24,130,32"/>
+<area shape="rect" id="Node000003" href="$class_model.html#a5a9574ada30daa44f92954a8ec2e3435" title="Регистрация пользователя" alt="" coords="9,56,91,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="125,56,92,64,91,59,130,55"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="view.h" name="view.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="258,5,316,32"/>
+<area shape="rect" id="Node000002" href="$controller_8h.html" title=" " alt="" coords="194,80,279,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="268,47,247,81,243,78,271,43"/>
+<area shape="rect" id="Node000009" href="$view_8cpp.html" title=" " alt="" coords="303,80,375,107"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="305,42,333,80,327,80,304,47"/>
+<area shape="rect" id="Node000003" href="$controller_8cpp.html" title=" " alt="" coords="133,155,232,181"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,122,194,156,190,153,219,117"/>
+<area shape="rect" id="Node000004" href="$server_8h.html" title=" " alt="" coords="257,155,325,181"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="255,117,284,154,279,154,255,122"/>
+<area shape="rect" id="Node000005" href="$moc__server_8cpp.html" title=" " alt="" coords="5,229,230,304"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="253,191,185,231,182,227,257,187"/>
+<area shape="rect" id="Node000007" href="$main_8cpp.html" title=" " alt="" coords="254,253,328,280"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="292,195,293,254,288,252,289,199"/>
+<area shape="rect" id="Node000008" href="$server_8cpp.html" title=" " alt="" coords="352,253,435,280"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="316,190,383,253,378,253,315,195"/>
+<area shape="rect" id="Node000006" href="$mocs__compilation_8cpp.html" title=" " alt="" coords="5,352,230,427"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="119,318,120,352,115,351,116,322"/>
+</map>

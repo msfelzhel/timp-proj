@@ -1,5 +1,8 @@
 var NAVTREEINDEX6 =
 {
+"struct_fts5_extension_api.html#ae1eb7ad1d3c131a09376134ecc099568":[1,0,5,18],
+"struct_fts5_extension_api.html#ae2584a3afa2a70504847600e609d43ad":[1,0,5,11],
+"struct_fts5_extension_api.html#ae699a91c958cbac92a2ae8000670ef89":[1,0,5,14],
 "struct_fts5_extension_api.html#ae77e066f5eba264ba0dc8701fc59264d":[1,0,5,6],
 "struct_fts5_extension_api.html#aeda6faa66f47f9116c9ceba882aaedd2":[1,0,5,15],
 "struct_fts5_extension_api.html#aefe6eb4685546e58f056a61da39a2bcb":[1,0,5,3],

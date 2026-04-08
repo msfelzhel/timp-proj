@@ -97,6 +97,14 @@ $(function(){initNavTree('class_model.html','','class_model-members'); });
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="model_8h_source.html">model.h</a>&gt;</code></p>
+<div class="dynheader">
+Collaboration diagram for Model:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_model__coll__graph.png" border="0" usemap="#a_model_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="a_model_coll__map" id="a_model_coll__map">
+<area shape="rect" title="Класс работы с базой данных SQLite." alt="" coords="5,5,72,181"/>
+</map>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -108,6 +116,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5a9574ada30daa44f92954a8ec2e3435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Регистрация пользователя  <br /></td></tr>
 <tr class="memitem:abf1a45e0db97a7a87420352683fab68f" id="r_abf1a45e0db97a7a87420352683fab68f"><td class="memItemLeft">QString&#160;</td><td class="memItemRight"><a class="el" href="#abf1a45e0db97a7a87420352683fab68f">stat</a> (const QString &amp;login)</td></tr>
 <tr class="memdesc:abf1a45e0db97a7a87420352683fab68f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Получение статистики  <br /></td></tr>
+<tr class="memitem:a726c8e21b71a3d972f432ac51bb451ee" id="r_a726c8e21b71a3d972f432ac51bb451ee"><td class="memItemLeft">QString&#160;</td><td class="memItemRight"><a class="el" href="#a726c8e21b71a3d972f432ac51bb451ee">calc</a> (double a, double b, double c)</td></tr>
 <tr class="memitem:a57c96a39195649198aeae6c8ef995ad2" id="r_a57c96a39195649198aeae6c8ef995ad2"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a57c96a39195649198aeae6c8ef995ad2">check</a> (int task, const QString &amp;variant, const QString &amp;answer)</td></tr>
 <tr class="memdesc:a57c96a39195649198aeae6c8ef995ad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Проверка решения задачи  <br /></td></tr>
 </table>
@@ -134,11 +143,11 @@ Public Member Functions</h2></td></tr>
 <p>Конструктор </p>
 <p>Конструктор модели </p>
 
-<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00010">10</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   10</span>             {</div>
-<div class="line"><span class="lineno">   11</span>    initDB();</div>
-<div class="line"><span class="lineno">   12</span>    createTable();</div>
-<div class="line"><span class="lineno">   13</span>}</div>
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00019">19</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   19</span>             {</div>
+<div class="line"><span class="lineno">   20</span>    initDB();</div>
+<div class="line"><span class="lineno">   21</span>    createTable();</div>
+<div class="line"><span class="lineno">   22</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -164,24 +173,96 @@ Public Member Functions</h2></td></tr>
 
 <p>Авторизация </p>
 
-<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00057">57</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   57</span>                                                              {</div>
-<div class="line"><span class="lineno">   58</span>    QString query = <span class="stringliteral">&quot;SELECT * FROM users WHERE login=&#39;&quot;</span> + login + <span class="stringliteral">&quot;&#39; AND password=&#39;&quot;</span> + password + <span class="stringliteral">&quot;&#39;;&quot;</span>;</div>
-<div class="line"><span class="lineno">   59</span> </div>
-<div class="line"><span class="lineno">   60</span>    <span class="keywordtype">bool</span> found = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>    <span class="keyword">auto</span> callback = [](<span class="keywordtype">void</span> *data, int, <span class="keywordtype">char</span> **, <span class="keywordtype">char</span> **)-&gt;<span class="keywordtype">int</span> {</div>
-<div class="line"><span class="lineno">   63</span>        <span class="keywordtype">bool</span> *f = (<span class="keywordtype">bool</span>*)data;</div>
-<div class="line"><span class="lineno">   64</span>        *f = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">   66</span>    };</div>
-<div class="line"><span class="lineno">   67</span> </div>
-<div class="line"><span class="lineno">   68</span>    <a class="code hl_function" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db">sqlite3_exec</a>(<a class="code hl_variable" href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a>, query.toUtf8().data(), callback, &amp;found, 0);</div>
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00067">67</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   67</span>                                                              {</div>
+<div class="line"><span class="lineno">   68</span>    QString hashed = <a class="code hl_function" href="model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab">hashPassword</a>(password);</div>
 <div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>    <span class="keywordflow">return</span> found;</div>
-<div class="line"><span class="lineno">   71</span>}</div>
-<div class="ttc" id="amodel_8cpp_html_ad6e663497d2c934364b3bcf07496b30b"><div class="ttname"><a href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a></div><div class="ttdeci">sqlite3 * db</div><div class="ttdef"><b>Definition</b> <a href="model_8cpp_source.html#l00005">model.cpp:5</a></div></div>
+<div class="line"><span class="lineno">   70</span>    QString query = <span class="stringliteral">&quot;SELECT * FROM users WHERE login=&#39;&quot;</span> + login + <span class="stringliteral">&quot;&#39; AND password=&#39;&quot;</span> + hashed + <span class="stringliteral">&quot;&#39;;&quot;</span>;</div>
+<div class="line"><span class="lineno">   71</span> </div>
+<div class="line"><span class="lineno">   72</span>    <span class="keywordtype">bool</span> found = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   73</span> </div>
+<div class="line"><span class="lineno">   74</span>    <span class="keyword">auto</span> callback = [](<span class="keywordtype">void</span> *data, int, <span class="keywordtype">char</span> **, <span class="keywordtype">char</span> **)-&gt;<span class="keywordtype">int</span> {</div>
+<div class="line"><span class="lineno">   75</span>        <span class="keywordtype">bool</span> *f = (<span class="keywordtype">bool</span>*)data;</div>
+<div class="line"><span class="lineno">   76</span>        *f = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">   78</span>    };</div>
+<div class="line"><span class="lineno">   79</span> </div>
+<div class="line"><span class="lineno">   80</span>    <a class="code hl_function" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db">sqlite3_exec</a>(<a class="code hl_variable" href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a>, query.toUtf8().data(), callback, &amp;found, 0);</div>
+<div class="line"><span class="lineno">   81</span> </div>
+<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">return</span> found;</div>
+<div class="line"><span class="lineno">   83</span>}</div>
+<div class="ttc" id="amodel_8cpp_html_a9cc95b29ba3120df7870a1de3d0366ab"><div class="ttname"><a href="model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab">hashPassword</a></div><div class="ttdeci">QString hashPassword(const QString &amp;password)</div><div class="ttdef"><b>Definition</b> <a href="model_8cpp_source.html#l00006">model.cpp:6</a></div></div>
+<div class="ttc" id="amodel_8cpp_html_ad6e663497d2c934364b3bcf07496b30b"><div class="ttname"><a href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a></div><div class="ttdeci">sqlite3 * db</div><div class="ttdef"><b>Definition</b> <a href="model_8cpp_source.html#l00014">model.cpp:14</a></div></div>
 <div class="ttc" id="asqlite3_8h_html_a97487ec8150e0bcc8fa392ab8f0e24db"><div class="ttname"><a href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db">sqlite3_exec</a></div><div class="ttdeci">SQLITE_API int sqlite3_exec(sqlite3 *, const char *sql, int(*callback)(void *, int, char **, char **), void *, char **errmsg)</div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_model_a273d98ef3da82cad575d23e67401c66f_cgraph.png" border="0" usemap="#aclass_model_a273d98ef3da82cad575d23e67401c66f_cgraph" loading="lazy" alt=""/></div>
+<map name="aclass_model_a273d98ef3da82cad575d23e67401c66f_cgraph" id="aclass_model_a273d98ef3da82cad575d23e67401c66f_cgraph">
+<area shape="rect" title="Авторизация" alt="" coords="5,31,95,57"/>
+<area shape="rect" href="model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab" title=" " alt="" coords="143,5,250,32"/>
+<area shape="poly" title=" " alt="" coords="95,34,130,30,125,32,96,39"/>
+<area shape="rect" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db" title=" " alt="" coords="149,56,244,83"/>
+<area shape="poly" title=" " alt="" coords="95,49,137,58,131,59,95,54"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a726c8e21b71a3d972f432ac51bb451ee" name="a726c8e21b71a3d972f432ac51bb451ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a726c8e21b71a3d972f432ac51bb451ee">&#9670;&#160;</a></span>calc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString Model::calc </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>b</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>c</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00098">98</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   98</span>                                                {</div>
+<div class="line"><span class="lineno">   99</span>    QString result = <span class="stringliteral">&quot;calc&amp;&quot;</span>;</div>
+<div class="line"><span class="lineno">  100</span> </div>
+<div class="line"><span class="lineno">  101</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> PI = acos(-1.0);</div>
+<div class="line"><span class="lineno">  102</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> EPS = 1e-9;</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>    <span class="keywordflow">for</span> (<span class="keywordtype">double</span> x = -10; x &lt;= 10.0; x += 0.05) {</div>
+<div class="line"><span class="lineno">  105</span>        <span class="keywordtype">double</span> y;</div>
+<div class="line"><span class="lineno">  106</span>        <span class="keywordtype">bool</span> ok = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  107</span> </div>
+<div class="line"><span class="lineno">  108</span>        <span class="keywordflow">if</span> (x &lt; -PI) {</div>
+<div class="line"><span class="lineno">  109</span>            y = cos(a * x);</div>
+<div class="line"><span class="lineno">  110</span>        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &lt; 0) {</div>
+<div class="line"><span class="lineno">  111</span>            <span class="keywordflow">if</span> (fabs(x + PI) &lt; EPS) ok = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  112</span>            <span class="keywordflow">else</span> y = b / (x + PI);</div>
+<div class="line"><span class="lineno">  113</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  114</span>            <span class="keywordtype">double</span> s = sin(c + x);</div>
+<div class="line"><span class="lineno">  115</span>            <span class="keywordflow">if</span> (fabs(s) &lt; EPS) ok = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  116</span>            <span class="keywordflow">else</span> y = cos(c + x) / s;</div>
+<div class="line"><span class="lineno">  117</span>        }</div>
+<div class="line"><span class="lineno">  118</span> </div>
+<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">if</span> (ok &amp;&amp; std::isfinite(y)) {</div>
+<div class="line"><span class="lineno">  120</span>            <span class="keywordflow">if</span> (fabs(y) &gt; 1000) <span class="keywordflow">continue</span>; <span class="comment">// защита от бесконечностей</span></div>
+<div class="line"><span class="lineno">  121</span>            result += QString::number(x) + <span class="stringliteral">&quot;,&quot;</span> + QString::number(y) + <span class="stringliteral">&quot;;&quot;</span>;</div>
+<div class="line"><span class="lineno">  122</span>        }</div>
+<div class="line"><span class="lineno">  123</span>    }</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><span class="lineno">  126</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -211,10 +292,10 @@ Public Member Functions</h2></td></tr>
 
 <p>Проверка решения задачи </p>
 
-<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00083">83</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   83</span>                                                                  {</div>
-<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">return</span> task == 1 &amp;&amp; answer == <span class="stringliteral">&quot;42&quot;</span>;</div>
-<div class="line"><span class="lineno">   85</span>}</div>
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00095">95</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   95</span>                                                                  {</div>
+<div class="line"><span class="lineno">   96</span>    <span class="keywordflow">return</span> task == 1 &amp;&amp; answer == <span class="stringliteral">&quot;42&quot;</span>;</div>
+<div class="line"><span class="lineno">   97</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -244,24 +325,39 @@ Public Member Functions</h2></td></tr>
 
 <p>Регистрация пользователя </p>
 
-<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00039">39</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   39</span>                                                                                   {</div>
-<div class="line"><span class="lineno">   40</span>    QString query = <span class="stringliteral">&quot;INSERT INTO users VALUES(&#39;&quot;</span> + login + <span class="stringliteral">&quot;&#39;,&#39;&quot;</span> + password + <span class="stringliteral">&quot;&#39;,&#39;&quot;</span> + email + <span class="stringliteral">&quot;&#39;);&quot;</span>;</div>
-<div class="line"><span class="lineno">   41</span> </div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordtype">char</span> *err = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">   43</span>    <span class="keywordtype">int</span> rc = <a class="code hl_function" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db">sqlite3_exec</a>(<a class="code hl_variable" href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a>, query.toUtf8().data(), 0, 0, &amp;err);</div>
-<div class="line"><span class="lineno">   44</span> </div>
-<div class="line"><span class="lineno">   45</span>    <span class="keywordflow">if</span> (rc != <a class="code hl_define" href="sqlite3_8h.html#a650d09c7bec7ddadb7c8aa3519dc842c">SQLITE_OK</a>) {</div>
-<div class="line"><span class="lineno">   46</span>        qDebug() &lt;&lt; <span class="stringliteral">&quot;SQL error:&quot;</span> &lt;&lt; err;</div>
-<div class="line"><span class="lineno">   47</span>        <a class="code hl_function" href="sqlite3_8h.html#a6552349e36a8a691af5487999ab09519">sqlite3_free</a>(err);</div>
-<div class="line"><span class="lineno">   48</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   49</span>    }</div>
-<div class="line"><span class="lineno">   50</span> </div>
-<div class="line"><span class="lineno">   51</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   52</span>}</div>
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00048">48</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   48</span>                                                                                   {</div>
+<div class="line"><span class="lineno">   49</span>    QString hashed = <a class="code hl_function" href="model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab">hashPassword</a>(password);</div>
+<div class="line"><span class="lineno">   50</span>    QString query = <span class="stringliteral">&quot;INSERT INTO users VALUES(&#39;&quot;</span> + login + <span class="stringliteral">&quot;&#39;,&#39;&quot;</span> + hashed + <span class="stringliteral">&quot;&#39;,&#39;&quot;</span> + email + <span class="stringliteral">&quot;&#39;);&quot;</span>;</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordtype">char</span> *err = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   53</span>    <span class="keywordtype">int</span> rc = <a class="code hl_function" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db">sqlite3_exec</a>(<a class="code hl_variable" href="model_8cpp.html#ad6e663497d2c934364b3bcf07496b30b">db</a>, query.toUtf8().data(), 0, 0, &amp;err);</div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>    <span class="keywordflow">if</span> (rc != <a class="code hl_define" href="sqlite3_8h.html#a650d09c7bec7ddadb7c8aa3519dc842c">SQLITE_OK</a>) {</div>
+<div class="line"><span class="lineno">   56</span>        qDebug() &lt;&lt; <span class="stringliteral">&quot;SQL error:&quot;</span> &lt;&lt; err;</div>
+<div class="line"><span class="lineno">   57</span>        <a class="code hl_function" href="sqlite3_8h.html#a6552349e36a8a691af5487999ab09519">sqlite3_free</a>(err);</div>
+<div class="line"><span class="lineno">   58</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   59</span>    }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   62</span>}</div>
 <div class="ttc" id="asqlite3_8h_html_a650d09c7bec7ddadb7c8aa3519dc842c"><div class="ttname"><a href="sqlite3_8h.html#a650d09c7bec7ddadb7c8aa3519dc842c">SQLITE_OK</a></div><div class="ttdeci">#define SQLITE_OK</div><div class="ttdef"><b>Definition</b> <a href="sqlite3_8h_source.html#l00449">sqlite3.h:449</a></div></div>
 <div class="ttc" id="asqlite3_8h_html_a6552349e36a8a691af5487999ab09519"><div class="ttname"><a href="sqlite3_8h.html#a6552349e36a8a691af5487999ab09519">sqlite3_free</a></div><div class="ttdeci">SQLITE_API void sqlite3_free(void *)</div></div>
-</div><!-- fragment -->
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_model_a5a9574ada30daa44f92954a8ec2e3435_cgraph.png" border="0" usemap="#aclass_model_a5a9574ada30daa44f92954a8ec2e3435_cgraph" loading="lazy" alt=""/></div>
+<map name="aclass_model_a5a9574ada30daa44f92954a8ec2e3435_cgraph" id="aclass_model_a5a9574ada30daa44f92954a8ec2e3435_cgraph">
+<area shape="rect" title="Регистрация пользователя" alt="" coords="5,56,88,83"/>
+<area shape="rect" href="model_8cpp.html#a9cc95b29ba3120df7870a1de3d0366ab" title=" " alt="" coords="136,5,243,32"/>
+<area shape="poly" title=" " alt="" coords="85,53,137,36,133,40,88,58"/>
+<area shape="rect" href="sqlite3_8h.html#a97487ec8150e0bcc8fa392ab8f0e24db" title=" " alt="" coords="142,56,236,83"/>
+<area shape="poly" title=" " alt="" coords="87,67,129,68,124,71,89,72"/>
+<area shape="rect" href="sqlite3_8h.html#a6552349e36a8a691af5487999ab09519" title=" " alt="" coords="145,107,234,133"/>
+<area shape="poly" title=" " alt="" coords="87,81,138,100,133,102,86,86"/>
+</map>
+</div>
+
 </div>
 </div>
 <a id="abf1a45e0db97a7a87420352683fab68f" name="abf1a45e0db97a7a87420352683fab68f"></a>
@@ -281,10 +377,10 @@ Public Member Functions</h2></td></tr>
 
 <p>Получение статистики </p>
 
-<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00076">76</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   76</span>                                   {</div>
-<div class="line"><span class="lineno">   77</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot;stat&amp;3$6&amp;21&quot;</span>;</div>
-<div class="line"><span class="lineno">   78</span>}</div>
+<p class="definition">Definition at line <a class="el" href="model_8cpp_source.html#l00088">88</a> of file <a class="el" href="model_8cpp_source.html">model.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   88</span>                                   {</div>
+<div class="line"><span class="lineno">   89</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot;stat&amp;3$6&amp;21&quot;</span>;</div>
+<div class="line"><span class="lineno">   90</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
