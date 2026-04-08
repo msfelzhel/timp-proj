@@ -1,0 +1,31 @@
+PROJECT_NAME           = "Function Client"
+PROJECT_BRIEF          = "PyQt5 клиент для визуализации функции"
+OUTPUT_DIRECTORY       = docs
+
+INPUT                  = .
+FILE_PATTERNS          = *.py
+
+RECURSIVE              = YES
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+OPTIMIZE_OUTPUT_FOR_C  = NO
+OPTIMIZE_OUTPUT_JAVA   = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+QUIET                  = NO
+WARNINGS               = YES
+
+GENERATE_TREEVIEW      = YES
+FULL_PATH_NAMES        = NO
+
+HAVE_DOT               = YES
+DOT_PATH = "C:\Program Files (x86)\Graphviz/bin"
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+CLASS_DIAGRAMS = YES
+UML_LOOK               = YES
