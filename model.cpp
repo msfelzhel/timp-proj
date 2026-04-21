@@ -1,9 +1,11 @@
+
 #include "model.h"
 #include "sqlite3.h"
 #include <QDebug>
 #include <QCryptographicHash>
+#include <cmath>
 
-QString hashPassword(const QString &password) {
+        QString hashPassword(const QString &password) {
     QByteArray hash = QCryptographicHash::hash(
         password.toUtf8(),
         QCryptographicHash::Sha256
@@ -83,6 +85,47 @@ bool Model::auth(const QString &login, const QString &password) {
 }
 
 /**
+ * @brief Проверка существования email
+ */
+bool Model::emailExists(const QString &email) {
+    QString query = "SELECT * FROM users WHERE email='" + email + "';";
+
+    bool found = false;
+
+    auto callback = [](void *data, int, char **, char **)->int {
+        bool *f = (bool*)data;
+        *f = true;
+        return 0;
+    };
+
+    sqlite3_exec(db, query.toUtf8().data(), callback, &found, 0);
+
+    return found;
+}
+
+/**
+ * @brief Смена пароля по email
+ */
+bool Model::updatePasswordByEmail(const QString &email, const QString &newPassword) {
+    QString hashed = hashPassword(newPassword);
+
+    QString query =
+        "UPDATE users SET password='" + hashed +
+        "' WHERE email='" + email + "';";
+
+    char *err = nullptr;
+    int rc = sqlite3_exec(db, query.toUtf8().data(), 0, 0, &err);
+
+    if (rc != SQLITE_OK) {
+        qDebug() << "SQL error:" << err;
+        sqlite3_free(err);
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * @brief Получение статистики
  */
 QString Model::stat(const QString &) {
@@ -95,6 +138,10 @@ QString Model::stat(const QString &) {
 bool Model::check(int task, const QString &, const QString &answer) {
     return task == 1 && answer == "42";
 }
+
+/**
+ * @brief Расчет функции
+ */
 QString Model::calc(double a, double b, double c) {
     QString result = "calc&";
 
@@ -117,10 +164,11 @@ QString Model::calc(double a, double b, double c) {
         }
 
         if (ok && std::isfinite(y)) {
-            if (fabs(y) > 1000) continue; // защита от бесконечностей
+            if (fabs(y) > 1000) continue;
             result += QString::number(x) + "," + QString::number(y) + ";";
         }
     }
 
     return result;
 }
+

@@ -21,6 +21,8 @@ add_executable(timp_tsp_server
     model.cpp model.h
     view.cpp view.h
     sqlite3.c
+    smtp_client.h smtp_client.cpp
+    email_service.h email_service.cpp
 )
 
 # Говорим что sqlite это C файл
