@@ -5,11 +5,13 @@ import socket
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QSlider, QGroupBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QPushButton, QLineEdit, QStackedWidget, QMessageBox
+    QHeaderView, QPushButton, QLineEdit, QStackedWidget, QMessageBox,
+    QDialog, QFormLayout
 )
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
-from PyQt5.QtGui import QPainter, QPen, QPolygonF, QColor, QFont
+from PyQt5.QtGui import QPainter, QPen, QPolygonF, QColor, QFont, QPixmap
+
 
 
 class TcpClient:
@@ -26,6 +28,12 @@ class TcpClient:
                 return data
         except Exception as e:
             return f"error: {e}"
+
+    def request_reset(self, email: str) -> str:
+        return self.send(f"reset_request&{email}")
+
+    def confirm_reset(self, email: str, code: str, new_pass: str) -> str:
+        return self.send(f"reset_confirm&{email}&{code}&{new_pass}")
 
 
 class CustomChartView(QChartView):
@@ -63,6 +71,83 @@ class CustomChartView(QChartView):
         ]))
 
 
+class ForgotPasswordDialog(QDialog):
+    def __init__(self, client, parent=None):
+        super().__init__(parent)
+        self.client = client
+        self.email = ""
+
+        self.setWindowTitle("Восстановление пароля")
+        self.setModal(True)
+        self.setMinimumWidth(360)
+
+        layout = QVBoxLayout(self)
+
+        self.email_edit = QLineEdit()
+        self.email_edit.setPlaceholderText("Email")
+
+        self.code_edit = QLineEdit()
+        self.code_edit.setPlaceholderText("Код из письма")
+
+        self.new_pass = QLineEdit()
+        self.new_pass.setPlaceholderText("Новый пароль")
+        self.new_pass.setEchoMode(QLineEdit.Password)
+
+        self.confirm_pass = QLineEdit()
+        self.confirm_pass.setPlaceholderText("Повторите пароль")
+        self.confirm_pass.setEchoMode(QLineEdit.Password)
+
+        self.send_btn = QPushButton("Получить код")
+        self.reset_btn = QPushButton("Сменить пароль")
+
+        layout.addWidget(self.email_edit)
+        layout.addWidget(self.send_btn)
+        layout.addWidget(self.code_edit)
+        layout.addWidget(self.new_pass)
+        layout.addWidget(self.confirm_pass)
+        layout.addWidget(self.reset_btn)
+
+        self.send_btn.clicked.connect(self.send_code)
+        self.reset_btn.clicked.connect(self.reset_password)
+
+    def send_code(self):
+        email = self.email_edit.text().strip()
+        if not email:
+            QMessageBox.warning(self, "Ошибка", "Введите email")
+            return
+
+        resp = self.client.request_reset(email)
+        if resp == "reset_sent":
+            self.email = email
+            QMessageBox.information(self, "Успех", "Код отправлен на почту")
+        else:
+            QMessageBox.warning(self, "Ошибка", "Не удалось отправить код")
+
+    def reset_password(self):
+        if not self.email:
+            QMessageBox.warning(self, "Ошибка", "Сначала запросите код")
+            return
+
+        code = self.code_edit.text().strip()
+        new_pass = self.new_pass.text()
+        confirm = self.confirm_pass.text()
+
+        if not code or not new_pass or not confirm:
+            QMessageBox.warning(self, "Ошибка", "Заполните все поля")
+            return
+
+        if new_pass != confirm:
+            QMessageBox.warning(self, "Ошибка", "Пароли не совпадают")
+            return
+
+        resp = self.client.confirm_reset(self.email, code, new_pass)
+        if resp == "reset_ok":
+            QMessageBox.information(self, "Успех", "Пароль изменён")
+            self.accept()
+        else:
+            QMessageBox.warning(self, "Ошибка", "Неверный код или ошибка сброса")
+
+
 class FunctionScreen(QWidget):
     def __init__(self, client, parent=None):
         super().__init__(parent)
@@ -78,19 +163,15 @@ class FunctionScreen(QWidget):
         left_layout = QVBoxLayout(left)
         left_layout.setAlignment(Qt.AlignTop)
 
-        formula = QLabel(
-            "<html>"
-            "<p style='font-size:12pt; font-weight:bold;'>f(x) = </p>"
-            "<p style='margin-left:20px;'>"
-            "cos(a·x) &nbsp;&nbsp;&nbsp; при x &lt; -π<br>"
-            "b / (x + π) &nbsp;&nbsp; при -π ≤ x &lt; 0<br>"
-            "cot(c + x) &nbsp;&nbsp;&nbsp; при x ≥ 0"
-            "</p>"
-            "<p>x ∈ [-10; 10]</p>"
-            "</html>"
-        )
-        formula.setWordWrap(True)
-        left_layout.addWidget(formula)
+        formula_pixmap = QLabel()
+        pixmap = QPixmap("formula.png")
+        if not pixmap.isNull():
+            # Масштабируем картинку по ширине, сохраняя пропорции
+            scaled_pixmap = pixmap.scaledToWidth(300, Qt.SmoothTransformation)
+            formula_pixmap.setPixmap(scaled_pixmap)
+        else:
+            formula_pixmap.setText("Изображение формулы не найдено")
+        left_layout.addWidget(formula_pixmap)
         left_layout.addSpacing(20)
 
         def make_slider(name, minv, maxv, val):
@@ -225,12 +306,13 @@ class FunctionScreen(QWidget):
     def update_table(self):
         points = self._request_points(-10.0, 10.0, 2.0)
         self.table.setRowCount(len(points))
-
         for i, (x, y) in enumerate(points):
             self.table.setItem(i, 0, QTableWidgetItem(f"{x:.2f}"))
             self.table.setItem(i, 1, QTableWidgetItem(f"{y:.6f}"))
-
-        self.table.resizeColumnsToContents()
+        # Принудительное растяжение колонок на всю ширину таблицы
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
 
     def _add_segment(self, points, color):
         if len(points) < 2:
@@ -259,7 +341,7 @@ class FunctionScreen(QWidget):
             self.y_line.clear()
             self.y_line.append(0, -1)
             self.y_line.append(0, 1)
-            self.chart.setTitle(f"График  |  a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
+            self.chart.setTitle(f"График: a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
             return
 
         left_points = []
@@ -304,17 +386,13 @@ class FunctionScreen(QWidget):
         split_and_add(mid_points, QColor(0, 255, 0))
         split_and_add(right_points, QColor(0, 0, 255))
 
-        all_pts = points
-        # режем выбросы
-        filtered = [y for _, y in all_pts if abs(y) < 50]
-
+        filtered = [y for _, y in points if abs(y) < 50]
         if not filtered:
             filtered = [0]
 
         ymin = min(filtered)
         ymax = max(filtered)
 
-        # фиксируем границы если надо
         ymin = max(ymin, -20)
         ymax = min(ymax, 20)
 
@@ -335,7 +413,7 @@ class FunctionScreen(QWidget):
         self.y_line.append(0, ymin)
         self.y_line.append(0, ymax)
 
-        self.chart.setTitle(f"График  |  a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
+        self.chart.setTitle(f"График: a = {self.a:.2f}, b = {self.b:.2f}, c = {self.c:.2f}")
 
 
 class TitleScreen(QWidget):
@@ -386,11 +464,13 @@ class AuthScreen(QWidget):
         self.login_password.setPlaceholderText("Пароль")
         self.login_password.setEchoMode(QLineEdit.Password)
         self.login_btn = QPushButton("Войти")
+        self.forgot_btn = QPushButton("Забыли пароль?")
         self.to_register_btn = QPushButton("Нет аккаунта? Зарегистрироваться")
 
         login_layout.addWidget(self.login_username)
         login_layout.addWidget(self.login_password)
         login_layout.addWidget(self.login_btn)
+        login_layout.addWidget(self.forgot_btn)
         login_layout.addWidget(self.to_register_btn)
 
         self.register_widget = QWidget()
@@ -406,12 +486,15 @@ class AuthScreen(QWidget):
         self.reg_confirm = QLineEdit()
         self.reg_confirm.setPlaceholderText("Подтвердите пароль")
         self.reg_confirm.setEchoMode(QLineEdit.Password)
+        self.reg_email = QLineEdit()
+        self.reg_email.setPlaceholderText("Email")
         self.register_btn = QPushButton("Зарегистрироваться")
         self.to_login_btn = QPushButton("Уже есть аккаунт? Войти")
 
         reg_layout.addWidget(self.reg_username)
         reg_layout.addWidget(self.reg_password)
         reg_layout.addWidget(self.reg_confirm)
+        reg_layout.addWidget(self.reg_email)
         reg_layout.addWidget(self.register_btn)
         reg_layout.addWidget(self.to_login_btn)
 
@@ -420,8 +503,13 @@ class AuthScreen(QWidget):
 
         self.login_btn.clicked.connect(self.do_login)
         self.register_btn.clicked.connect(self.do_register)
+        self.forgot_btn.clicked.connect(self.open_forgot_dialog)
         self.to_register_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.register_widget))
         self.to_login_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.login_widget))
+
+    def open_forgot_dialog(self):
+        dlg = ForgotPasswordDialog(self.client, self)
+        dlg.exec_()
 
     def do_login(self):
         username = self.login_username.text().strip()
@@ -439,8 +527,9 @@ class AuthScreen(QWidget):
         username = self.reg_username.text().strip()
         password = self.reg_password.text()
         confirm = self.reg_confirm.text()
+        email = self.reg_email.text().strip()
 
-        if not username or not password:
+        if not username or not password or not email:
             QMessageBox.warning(self, "Ошибка", "Заполните все поля")
             return
 
@@ -448,7 +537,7 @@ class AuthScreen(QWidget):
             QMessageBox.warning(self, "Ошибка", "Пароли не совпадают")
             return
 
-        response = self.client.send(f"reg&{username}&{password}&test@mail.com")
+        response = self.client.send(f"reg&{username}&{password}&{email}")
 
         if response.startswith("reg+"):
             QMessageBox.information(self, "Успех", "Регистрация успешна! Теперь войдите.")
