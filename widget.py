@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QSlider, QGroupBox, QTableWidget, QTableWidgetItem,
     QHeaderView, QPushButton, QLineEdit, QStackedWidget, QMessageBox,
-    QDialog
+    QDialog, QSizePolicy, QToolButton
 )
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
@@ -78,32 +78,44 @@ class ForgotPasswordDialog(QDialog):
 
         self.setWindowTitle("Восстановление пароля")
         self.setModal(True)
-        self.setMinimumWidth(400)
+        self.setMinimumSize(800, 600)
+        self.resize(800, 600)
 
         layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(15)
+        layout.setContentsMargins(0, 30, 0, 30)
+
+        field_width = 600
 
         self.email_edit = QLineEdit()
         self.email_edit.setPlaceholderText("Email")
-        self.email_edit.setMinimumWidth(250)
+        self.email_edit.setFixedWidth(field_width)
+        self.email_edit.setFont(QFont("Arial", 14))
 
         self.code_edit = QLineEdit()
         self.code_edit.setPlaceholderText("Код из письма")
-        self.code_edit.setMinimumWidth(250)
+        self.code_edit.setFixedWidth(field_width)
+        self.code_edit.setFont(QFont("Arial", 14))
 
         self.new_pass = QLineEdit()
         self.new_pass.setPlaceholderText("Новый пароль")
         self.new_pass.setEchoMode(QLineEdit.Password)
-        self.new_pass.setMinimumWidth(250)
+        self.new_pass.setFixedWidth(field_width)
+        self.new_pass.setFont(QFont("Arial", 14))
 
         self.confirm_pass = QLineEdit()
         self.confirm_pass.setPlaceholderText("Повторите пароль")
         self.confirm_pass.setEchoMode(QLineEdit.Password)
-        self.confirm_pass.setMinimumWidth(250)
+        self.confirm_pass.setFixedWidth(field_width)
+        self.confirm_pass.setFont(QFont("Arial", 14))
 
         self.send_btn = QPushButton("Получить код")
-        self.send_btn.setFixedWidth(200)
+        self.send_btn.setFixedWidth(field_width)
+        self.send_btn.setFont(QFont("Arial", 14))
         self.reset_btn = QPushButton("Сменить пароль")
-        self.reset_btn.setFixedWidth(200)
+        self.reset_btn.setFixedWidth(field_width)
+        self.reset_btn.setFont(QFont("Arial", 14))
 
         layout.addWidget(self.email_edit, alignment=Qt.AlignCenter)
         layout.addWidget(self.send_btn, alignment=Qt.AlignCenter)
@@ -161,13 +173,16 @@ class ProjectInfoScreen(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(50, 50, 50, 50)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(50, 20, 50, 20)  # большие отступы слева и справа
+
+        layout.addStretch()
 
         title = QLabel("О курсовом проекте")
         title.setFont(QFont("Arial", 22, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
+
         layout.addSpacing(30)
 
         info = QLabel(
@@ -187,10 +202,14 @@ class ProjectInfoScreen(QWidget):
         )
         info.setFont(QFont("Arial", 13))
         info.setWordWrap(True)
-        layout.addWidget(info)
+        info.setAlignment(Qt.AlignLeft)   # выравнивание по левому краю
+        info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)  # растягивается по горизонтали
+        layout.addWidget(info)  # без alignment, чтобы занимал всю доступную ширину
+
         layout.addSpacing(40)
 
         btn_layout = QHBoxLayout()
+        btn_layout.setAlignment(Qt.AlignCenter)
         self.back_btn = QPushButton("← Назад")
         self.back_btn.setFixedSize(140, 45)
         self.back_btn.setFont(QFont("Arial", 12))
@@ -202,7 +221,8 @@ class ProjectInfoScreen(QWidget):
         btn_layout.addWidget(self.back_btn)
         btn_layout.addWidget(self.next_btn)
         layout.addLayout(btn_layout)
-        layout.setAlignment(btn_layout, Qt.AlignCenter)
+
+        layout.addStretch()
 
     def go_back(self):
         self.parent_app.show_title_screen()
@@ -219,16 +239,25 @@ class FunctionInfoScreen(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(50, 50, 50, 50)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(50, 20, 50, 20)
+
+        layout.addStretch()
 
         title = QLabel("Исследуемая функция и её особенности")
         title.setFont(QFont("Arial", 22, QFont.Bold))
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
+
         layout.addSpacing(20)
 
-        # Формула
+        subtitle = QLabel("Для выполнения задания была получена следующая функция:")
+        subtitle.setFont(QFont("Arial", 14))
+        subtitle.setAlignment(Qt.AlignCenter)
+        layout.addWidget(subtitle)
+
+        layout.addSpacing(20)
+
         formula_label = QLabel()
         pixmap = QPixmap("formula.png")
         if not pixmap.isNull():
@@ -244,13 +273,12 @@ class FunctionInfoScreen(QWidget):
             formula_label.setFont(QFont("Courier New", 16))
             formula_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(formula_label, alignment=Qt.AlignCenter)
+
         layout.addSpacing(30)
 
-        # Особенности – изображение или текст
         features_label = QLabel()
         pixmap2 = QPixmap("features.png")
         if not pixmap2.isNull():
-            # Масштабируем изображение, сохраняя пропорции, чтобы не "отъезжало"
             scaled2 = pixmap2.scaledToWidth(600, Qt.SmoothTransformation)
             features_label.setPixmap(scaled2)
         else:
@@ -266,9 +294,11 @@ class FunctionInfoScreen(QWidget):
             features_label.setFont(QFont("Arial", 13))
             features_label.setWordWrap(True)
         layout.addWidget(features_label, alignment=Qt.AlignCenter)
+
         layout.addSpacing(40)
 
         btn_layout = QHBoxLayout()
+        btn_layout.setAlignment(Qt.AlignCenter)
         self.back_btn = QPushButton("← Назад")
         self.back_btn.setFixedSize(140, 45)
         self.back_btn.setFont(QFont("Arial", 12))
@@ -280,7 +310,8 @@ class FunctionInfoScreen(QWidget):
         btn_layout.addWidget(self.back_btn)
         btn_layout.addWidget(self.next_btn)
         layout.addLayout(btn_layout)
-        layout.setAlignment(btn_layout, Qt.AlignCenter)
+
+        layout.addStretch()
 
     def go_back(self):
         self.parent_app.show_project_info_screen()
@@ -415,7 +446,7 @@ class FunctionScreen(QWidget):
         self.axis_x.setLabelsFont(QFont("Arial", 11))
 
         self.axis_y = QValueAxis()
-        self.axis_y.setRange(-10, 10)          # фиксированный масштаб
+        self.axis_y.setRange(-10, 10)
         self.axis_y.setTitleText("f(x)")
         self.axis_y.setTitleFont(QFont("Arial", 12))
         self.axis_y.setLabelsFont(QFont("Arial", 11))
@@ -434,8 +465,8 @@ class FunctionScreen(QWidget):
         self.y_line = QLineSeries()
         self.x_line.append(-10, 0)
         self.x_line.append(10, 0)
-        self.y_line.append(0, -10)   # изменено с -1 на -10
-        self.y_line.append(0, 10)    # изменено с 1 на 10
+        self.y_line.append(0, -10)
+        self.y_line.append(0, 10)
 
         black_pen = QPen(Qt.black, 1.5)
         self.x_line.setPen(black_pen)
@@ -460,7 +491,6 @@ class FunctionScreen(QWidget):
         self.update_all()
 
     def update_chart_title(self):
-        # Увеличенный шрифт заголовка графика (14px)
         title_html = f"""
         <div style="font-size:14pt;">
             <span style="color:#FF0000;">cos(a·x)</span>
@@ -551,7 +581,6 @@ class FunctionScreen(QWidget):
 
         points = self._request_points(-10.0, 10.0, 0.05)
         if not points:
-            # оси всё равно перерисовываем для фиксированного диапазона
             self.y_line.clear()
             self.y_line.append(0, -10)
             self.y_line.append(0, 10)
@@ -593,9 +622,6 @@ class FunctionScreen(QWidget):
         split_and_add(mid_pts, QColor(0, 255, 0))
         split_and_add(right_pts, QColor(0, 0, 255))
 
-        # Блок динамического масштаба полностью удалён.
-        # Ось Y остаётся зафиксированной в пределах [-10, 10].
-
 
 class AuthScreen(QWidget):
     def __init__(self, parent=None):
@@ -609,7 +635,6 @@ class AuthScreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(15)
 
-        # Кнопка "Назад" в левом верхнем углу
         back_btn = QPushButton("← Назад")
         back_btn.setFixedSize(100, 35)
         back_btn.setFont(QFont("Arial", 11))
@@ -636,12 +661,28 @@ class AuthScreen(QWidget):
         self.login_username.setFixedWidth(800)
         login_layout.addWidget(self.login_username, alignment=Qt.AlignCenter)
 
+        # Контейнер для поля пароля и кнопки-глазика
+        password_container = QWidget()
+        password_container.setFixedWidth(800)
+        password_layout = QHBoxLayout(password_container)
+        password_layout.setContentsMargins(0, 0, 0, 0)
+        password_layout.setSpacing(5)
+
         self.login_password = QLineEdit()
         self.login_password.setPlaceholderText("Пароль")
         self.login_password.setEchoMode(QLineEdit.Password)
         self.login_password.setFont(QFont("Arial", 13))
-        self.login_password.setFixedWidth(800)
-        login_layout.addWidget(self.login_password, alignment=Qt.AlignCenter)
+        self.login_password.setStyleSheet("QLineEdit { border: 1px solid #8B008B; border-radius: 5px; padding: 5px; }")
+
+        self.eye_button = QToolButton()
+        self.eye_button.setText("👁")
+        self.eye_button.setCursor(Qt.PointingHandCursor)
+        self.eye_button.setStyleSheet("QToolButton { border: none; background: transparent; font-size: 16px; }")
+        self.eye_button.clicked.connect(self.toggle_password_visibility)
+
+        password_layout.addWidget(self.login_password)
+        password_layout.addWidget(self.eye_button)
+        login_layout.addWidget(password_container, alignment=Qt.AlignCenter)
 
         self.login_btn = QPushButton("Войти")
         self.login_btn.setFont(QFont("Arial", 13))
@@ -713,6 +754,14 @@ class AuthScreen(QWidget):
         self.forgot_btn.clicked.connect(self.open_forgot_dialog)
         self.to_register_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.register_widget))
         self.to_login_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.login_widget))
+
+    def toggle_password_visibility(self):
+        if self.login_password.echoMode() == QLineEdit.Password:
+            self.login_password.setEchoMode(QLineEdit.Normal)
+            self.eye_button.setText("🙈")
+        else:
+            self.login_password.setEchoMode(QLineEdit.Password)
+            self.eye_button.setText("👁")
 
     def go_back(self):
         self.parent_app.show_function_info_screen()
