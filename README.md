@@ -44,37 +44,44 @@
 ### Авторизация
 
 Запрос:
-auth&login&password
+`auth&login&password`
 
 Ответ:
+```
 auth+&login
+```
+```
 auth-
+```
 
 ### Регистрация
 
-Запрос:
-reg&login&password&email
+Запрос: ```reg&login&password&email```
 
 Ответ:
-reg+&login
-reg-
+
+```reg+&login```
+
+```reg-```
 
 ### Статистика
 
-Запрос:
-stat&login
+Запрос: ```stat&login```
 
-Ответ:
-stat&3$6&21
-
+Ответ: ```stat&3$6&21```
 ### Проверка задачи
 
 Запрос:
-check&task&variant&answer
+
+```check&task&variant&answer```
 
 Ответ:
+```
 check+
+```
+```
 check-
+```
 
 ## Сборка и запуск
 
@@ -85,17 +92,18 @@ check-
 3. Запустить (Ctrl+R)
 
 Сервер слушает порт:
-1234
+`1234`
 
 ---
 
 ### Через CMake
 
-mkdir build
+```mkdir build
 cd build
 cmake ..
 make
 ./timp_tsp_server
+```
 
 ---
 
@@ -103,12 +111,13 @@ make
 
 Подключение:
 
-telnet localhost 1234
+`telnet localhost 1234`
 
 Пример:
 
-reg&user&1234&mail@test.com
-auth&user&1234
+```reg&user&1234&mail@test.com```
+
+```auth&user&1234```
 
 ---
 
@@ -121,11 +130,13 @@ users.db
 
 Структура таблицы:
 
+```SQL
 CREATE TABLE users (
     login TEXT PRIMARY KEY,
     password TEXT,
     email TEXT
 );
+```
 
 ---
 
@@ -133,35 +144,37 @@ CREATE TABLE users (
 
 ### Сборка
 
+```
 docker build -t tcp_server .
-
+```
 ### Запуск
-
+```
 docker run -p 1234:1234 tcp_server
-
+```
 ### Подключение
-
+```
 telnet localhost 1234
-
+```
 ---
 
 ## Документация
 
 Документация генерируется через Doxygen.
-
+```
 doxygen
-
+```
 Результат:
+```
 docs/html/index.html
-
+```
 ---
 
 ## Пример работы
-
+```
 reg&test&1234&test@mail.com
 auth&test&1234
 check&1&a&42
-
+```
 ---
 
 
