@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y \
     build-essential \
     cmake \
+    libsqlite3-dev \
     qt6-base-dev \
     && rm -rf /var/lib/apt/lists/*
 

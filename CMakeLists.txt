@@ -35,3 +35,41 @@ target_link_libraries(timp_tsp_server PRIVATE
 )
 # для Qt5:
 # target_link_libraries(timp_tsp_server PRIVATE Qt5::Core Qt5::Network)
+# =========================
+# TEST MODEL
+# =========================
+
+find_package(Qt6 REQUIRED COMPONENTS Test)
+
+add_executable(test_model
+    tests/test_model.cpp
+
+    model.cpp
+    sqlite3.c
+)
+
+target_link_libraries(test_model PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+# =========================
+# TEST CONTROLLER
+# =========================
+
+add_executable(test_controller
+    tests/test_controller.cpp
+
+    controller.cpp
+    model.cpp
+    view.cpp
+    email_service.cpp
+    smtp_client.cpp
+    sqlite3.c
+)
+
+target_link_libraries(test_controller PRIVATE
+    Qt6::Core
+    Qt6::Network
+    Qt6::Test
+)
